@@ -3,7 +3,7 @@
 package vlib
 
 import (
-	lib "github.com/monobilisim/monokit2/lib"
+	lib "github.com/monobilisim/monokit_lib"
 )
 
 func UpsertVersion(name string, version string, versionMulti string) {

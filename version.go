@@ -3,8 +3,8 @@
 package main
 
 import (
-	"github.com/monobilisim/monokit2/lib"
-	vlib "github.com/monobilisim/monokit2/plugins/osHealth/vlib"
+	lib "github.com/monobilisim/monokit_lib"
+	vlib "github.com/monobilisim/monokit_osHealth/vlib"
 	"github.com/rs/zerolog"
 )
 

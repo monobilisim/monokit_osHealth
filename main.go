@@ -7,7 +7,7 @@ import (
 	"os/exec"
 	"strings"
 
-	lib "github.com/monobilisim/monokit2/lib"
+	lib "github.com/monobilisim/monokit_lib"
 )
 
 // comes from -ldflags "-X 'main.version=version'" flag in ci build

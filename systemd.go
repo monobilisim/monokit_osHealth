@@ -11,7 +11,7 @@ import (
 	"time"
 
 	"github.com/coreos/go-systemd/v22/dbus"
-	"github.com/monobilisim/monokit2/lib"
+	"github.com/monobilisim/monokit_lib"
 	"github.com/rs/zerolog"
 )
 

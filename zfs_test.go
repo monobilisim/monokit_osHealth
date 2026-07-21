@@ -8,7 +8,7 @@ import (
 	"testing"
 	"time"
 
-	lib "github.com/monobilisim/monokit2/lib"
+	lib "github.com/monobilisim/monokit_lib"
 )
 
 func TestCheckSystemDiskZFS(t *testing.T) {

@@ -8,7 +8,7 @@ import (
 	"slices"
 	"strconv"
 
-	lib "github.com/monobilisim/monokit2/lib"
+	lib "github.com/monobilisim/monokit_lib"
 	"github.com/rs/zerolog"
 	"github.com/shirou/gopsutil/v4/disk"
 )

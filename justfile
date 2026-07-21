@@ -7,6 +7,8 @@
 
 # Plugin name == directory name == go build tag == binary name.
 plugin  := file_name(justfile_directory())
+# Podman/OCI image + volume names must be lowercase; the build tag keeps its case.
+image   := lowercase(plugin) + "-tests"
 # Version stamped into the binary via -ldflags. Override with `VERSION=1.0.0 just ...`.
 version := env("VERSION", "devel")
 # Output directory: this plugin's own ./bin (kept self-contained per plugin/repo).
@@ -37,36 +39,26 @@ build-target goos goarch:
     echo "Building {{plugin}} {{version}} for {{goos}} {{goarch}}"
     GOOS={{goos}} GOARCH={{goarch}} go build -ldflags "-X 'main.version={{version}}'" -tags {{plugin}},{{goos}} -o "$out"
 
-# Build the test image and run this plugin's tests inside a Podman container.
-# Filter with `just test TestFoo` or `TESTNAME=TestFoo just test`.
+# Run this plugin's tests inside a Podman container (boots systemd as PID 1).
+# `just test` runs every test; `just test TestFoo` runs only matching tests.
 # Tests ALWAYS run inside Podman — never directly on the host.
-test testname=env("TESTNAME", ""):
+test filter="":
     #!/usr/bin/env bash
     set -euo pipefail
-    mkdir -p "{{justfile_directory()}}/logs/test"
-    podman build -t {{plugin}}-tests .
+    mkdir -p "{{justfile_directory()}}/logs"
+    podman build -t {{image}} -f Containerfile .
     podman run --rm -t \
         --systemd=always \
         --tmpfs /run \
         --tmpfs /run/lock \
-        -v {{plugin}}-go-mod-cache:/go/pkg/mod \
-        -v {{plugin}}-go-build-cache:/root/.cache/go-build \
-        -v "{{justfile_directory()}}/logs/test":/artifacts \
-        -e TESTNAME="{{testname}}" \
+        -v {{image}}-go-mod-cache:/go/pkg/mod \
+        -v {{image}}-go-build-cache:/root/.cache/go-build \
+        -v "{{justfile_directory()}}/logs":/artifacts \
+        -e TEST_TAG="{{plugin}}" \
+        -e TEST_RUN="{{filter}}" \
         -e HOST_UID="$(id -u)" \
         -e HOST_GID="$(id -g)" \
-        {{plugin}}-tests
-
-# Run the plugin's go tests. Invoked *inside* the Podman container by
-# docker-tests.service — do not run this directly on the host.
-test-in-container testname=env("TESTNAME", ""):
-    #!/usr/bin/env bash
-    set -uo pipefail
-    if [ -n "{{testname}}" ]; then
-        TEST=true go test -v -tags {{plugin}} -run "{{testname}}"
-    else
-        TEST=true go test -v -tags {{plugin}}
-    fi
+        {{image}}
 
 # Build then run the plugin, forwarding any extra ARGS (e.g. `just run -v`).
 run *args: build

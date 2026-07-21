@@ -1,0 +1,41 @@
+system-load-alarm:
+  enabled: true
+  # cpu core count * %80 to trigger alarm by default
+  limit-multiplier: 0.8
+  # sends what creates the load into alarm message
+  top-processes:
+    enabled: true
+    processes: 10
+
+ram-usage-alarm:
+  enabled: true
+  # %90 to trigger alarm by default
+  limit: 90
+  # sends what creates the ram usage into alarm message
+  top-processes:
+    enabled: true
+    processes: 10
+
+disk-usage-alarm:
+  enabled: true
+  # This alarm limit is for individual partitions, because different devices can be mounted on different OS parts.
+  # %90 to trigger alarm by default
+  limit: 90
+
+version-alarm:
+  enabled: true
+  # Each time any supported software updates its version, a Redmine news will be sent.
+
+# If any of the followed services got restarts a Zulip alarm will be sent
+# If a service got failed Redmine issue will be opened
+service-health-alarm:
+  enabled: true
+  services:
+    - "postgresql"
+  #  - "postgres*"
+  #  - "mysql"
+  #  - "nginx"
+
+# Zulip alarms for restarts and shutdown schedules
+power-alarm:
+  enabled: true

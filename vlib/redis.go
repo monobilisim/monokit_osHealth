@@ -1,5 +1,3 @@
-//go:build osHealth
-
 package vlib
 
 import (

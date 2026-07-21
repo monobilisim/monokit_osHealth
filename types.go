@@ -1,5 +1,3 @@
-//go:build osHealth
-
 package main
 
 type ProcUsage struct {

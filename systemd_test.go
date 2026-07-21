@@ -1,4 +1,4 @@
-//go:build osHealth && linux
+//go:build linux
 
 package main
 

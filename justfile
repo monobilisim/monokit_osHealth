@@ -1,13 +1,13 @@
 # justfile for a monokit2 plugin — compile & test recipes.
 # Run `just` or `just --list` to see the available recipes.
 #
-# This file is plugin-agnostic: the plugin name (which also doubles as the
-# go build tag and the output binary name) is derived from the directory name,
-# so the same justfile can be copied verbatim into any plugin directory.
+# This file is plugin-agnostic: the plugin name (used for the output binary name)
+# is derived from the directory name, so the same justfile can be copied verbatim
+# into any plugin directory.
 
-# Plugin name == directory name == go build tag == binary name.
+# Plugin name == directory name == output binary name.
 plugin  := file_name(justfile_directory())
-# Podman/OCI image + volume names must be lowercase; the build tag keeps its case.
+# Podman/OCI image + volume names must be lowercase.
 image   := lowercase(plugin) + "-tests"
 # Version stamped into the binary via -ldflags. Override with `VERSION=1.0.0 just ...`.
 version := env("VERSION", "devel")
@@ -23,7 +23,7 @@ build:
     @echo "Building {{plugin}} {{version}} for the host platform"
     mkdir -p "{{bindir}}"
     rm -f "{{bindir}}/{{plugin}}"
-    go build -ldflags "-X main.version={{version}}" -tags {{plugin}} -o "{{bindir}}/{{plugin}}"
+    go build -ldflags "-X main.version={{version}}" -o "{{bindir}}/{{plugin}}"
 
 # Clean, then cross-compile the plugin for every release target.
 build-all: clean (build-target "linux" "amd64") (build-target "linux" "arm64") (build-target "windows" "amd64") (build-target "freebsd" "amd64")
@@ -37,7 +37,7 @@ build-target goos goarch:
     [ "{{goos}}" = "windows" ] && ext=".exe"
     out="{{bindir}}/{{plugin}}_{{version}}_{{goos}}_{{goarch}}${ext}"
     echo "Building {{plugin}} {{version}} for {{goos}} {{goarch}}"
-    GOOS={{goos}} GOARCH={{goarch}} go build -ldflags "-X 'main.version={{version}}'" -tags {{plugin}},{{goos}} -o "$out"
+    GOOS={{goos}} GOARCH={{goarch}} go build -ldflags "-X 'main.version={{version}}'" -o "$out"
 
 # Run this plugin's tests inside a Podman container (boots systemd as PID 1).
 # `just test` runs every test; `just test TestFoo` runs only matching tests.
@@ -54,7 +54,6 @@ test filter="":
         -v {{image}}-go-mod-cache:/go/pkg/mod \
         -v {{image}}-go-build-cache:/root/.cache/go-build \
         -v "{{justfile_directory()}}/logs":/artifacts \
-        -e TEST_TAG="{{plugin}}" \
         -e TEST_RUN="{{filter}}" \
         -e HOST_UID="$(id -u)" \
         -e HOST_GID="$(id -g)" \
